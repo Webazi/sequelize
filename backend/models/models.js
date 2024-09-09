@@ -3,14 +3,25 @@ import db from '../config/database.js';
 
 const { DataTypes } = Sequelize;
 
-const ChatModel = db.define('chats', {
+export const ChatModel = db.define('chats', {
     chat: DataTypes.STRING,
     from: DataTypes.STRING
 }, {
     freezeTableName: true
 });
 
-export default ChatModel;
+
+
+export const login = db.define('users', {
+    email: DataTypes.STRING,
+    password: DataTypes.STRING
+}, {
+    freezeTableName: true
+});
+
+
+
+
 
 (async () => {
     try {
