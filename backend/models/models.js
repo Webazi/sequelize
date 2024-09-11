@@ -13,7 +13,7 @@ export const ChatModel = db.define('chats', {
 
 
 export const login = db.define('users', {
-    email: DataTypes.STRING,
+    username: DataTypes.STRING,
     password: DataTypes.STRING
 }, {
     freezeTableName: true

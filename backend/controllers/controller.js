@@ -43,18 +43,15 @@ export const PostChat = (req,res) =>{
 }
 
 export const  Login = async (req,res)=>
-    {const { email, password } = req.body;
+    {const { username, password } = req.body;
 
 try {
-  const user = await login.findOne({ where: { email } });
+  const user = await login.findOne({ where: { username } });
   if (!user) {
     return res.status(404).json({ error: 'User not found' });
-  }
-
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) {
-    return res.status(401).json({ error: 'Invalid password' });
-  }
+  }else{
+    return res.status(201).json({ msg: 'User found' });
+ }
         
     } catch (error) {
         res.status(404).json
@@ -62,3 +59,18 @@ try {
     
     }
 }
+
+export const Alelo = async (req,res)=>{
+    const {user,password} = req.body
+    try {
+        login.create({
+            username:user,
+            password:password
+        });
+        res.status(201).json({msg:"pesan terkirim",statCode:"201"})
+    } catch (error) {
+        res.status(404).json
+        console.log(error)
+        
+    }
+}  

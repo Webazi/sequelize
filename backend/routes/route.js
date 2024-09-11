@@ -1,5 +1,5 @@
 import express from "express";
-import { getChat, getChatById, RemChat, EditChat, PostChat, Login } from "../controllers/controller.js";
+import { getChat, getChatById, RemChat, EditChat, PostChat, Login, Alelo } from "../controllers/controller.js";
 
 const router = express.Router();
 
@@ -9,4 +9,5 @@ router.get('/remove:id', RemChat);
 router.get('/edit:id', EditChat);
 router.post('/post', PostChat);
 router.post('/login', Login);
+router.post('/create', Alelo);
 export default router;
