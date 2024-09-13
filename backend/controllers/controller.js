@@ -1,5 +1,5 @@
 import {login, ChatModel} from '../models/models.js'
-import bcrypt from 'bcrypt';
+import bcrypt, { compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 export const getChat = async(req,res) =>{
     try {
@@ -28,6 +28,7 @@ export const RemChat = (req,res) =>{
 export const PostChat = (req,res) =>{
     const name = req.body.name
     const from = req.body.from
+    
     try {
        ChatModel.create({
             chat:name,
@@ -46,13 +47,26 @@ export const  Login = async (req,res)=>
     {const { username, password } = req.body;
 
 try {
-  const user = await login.findOne({ where: { username } });
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
-  }else{
-    return res.status(201).json({ msg: 'User found' });
- }
-        
+    const user = await login.findOne({ where: { username } });
+    
+    if(!user){
+        res.status(404).json({msg:"user tidak di temukan",statCode:"404"})
+    }
+else if (user) {
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (isPasswordValid) {
+    res.status(200).json({msg:"password benar",statCode:"200"})
+  } else {
+    res.status(404).json({msg:"salah",statCode:"404"})
+  }
+}
+
+else {
+  // Tangani error jika user tidak ditemukan
+  console.log("User not found");
+  res.status(404).json({ error: "User not found" });
+}
+
     } catch (error) {
         res.status(404).json
         console.log(error)
@@ -62,12 +76,15 @@ try {
 
 export const Alelo = async (req,res)=>{
     const {user,password} = req.body
+  
     try {
+        const salt = 10
+        const hashed =  await bcrypt.hash(password,salt);
         login.create({
             username:user,
-            password:password
+            password:hashed
         });
-        res.status(201).json({msg:"pesan terkirim",statCode:"201"})
+        res.status(201).json({msg:"akun tersimpan",statCode:"201",hasil:`${hashed}`})
     } catch (error) {
         res.status(404).json
         console.log(error)
