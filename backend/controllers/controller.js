@@ -44,12 +44,12 @@ export const PostChat = (req,res) =>{
 }
 
 export const  Login = async (req,res)=>
-    {const { username, password } = req.body;
+    {const { email, password } = req.body;
 
 try {
-    const user = await login.findOne({ where: { username } });
+    const user = await login.findOne({ where: { email } });
     
-    if(!user){
+if(!user){
         res.status(404).json({msg:"user tidak di temukan",statCode:"404"})
     }
 else if (user) {
@@ -63,7 +63,7 @@ else if (user) {
 
 else {
   // Tangani error jika user tidak ditemukan
-  console.log("User not found");
+  console.log("User and password wrong");
   res.status(404).json({ error: "User not found" });
 }
 
@@ -75,19 +75,32 @@ else {
 }
 
 export const Alelo = async (req,res)=>{
-    const {user,password} = req.body
-  
+    const { email, username, password } = req.body;
+
     try {
-        const salt = 10
-        const hashed =  await bcrypt.hash(password,salt);
-        login.create({
-            username:user,
-            password:hashed
-        });
-        res.status(201).json({msg:"akun tersimpan",statCode:"201",hasil:`${hashed}`})
+        // Cek jika ada field yang kosong
+        if (!email || !username || !password) {
+            return res.status(400).json({ msg: "Semua field harus diisi", statCode: "400" });
+        }
+    
+        // Cek apakah email sudah terdaftar
+        const validation = await login.findOne({ where: { email } });
+        if (!validation) {
+            const saltRounds = 10;
+            const hashed = await bcrypt.hash(password, saltRounds);
+            await login.create({
+                username: username,
+                email: email,
+                password: hashed
+            });
+            return res.status(201).json({ msg: "Akun tersimpan", statCode: "201", hasil: hashed });
+        } else {
+            return res.status(409).json({ msg: "Email sudah terdaftar", statCode: "409" });
+        }
+    
     } catch (error) {
-        res.status(404).json
-        console.log(error)
-        
+        console.error(error);
+        return res.status(500).json({ msg: "Terjadi kesalahan pada server", error: error.message });
     }
+    
 }  
